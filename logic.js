@@ -209,7 +209,7 @@ function computeSignalCrypto(input){
 function positionSizing(market, entry, sl, riskPerTrade, preference){
   const tickVal = tickValueFor(market);
   const step = stepFor(market);
-  const ticks = Math.max(1, Math.round(Math.abs(entry - sl)/step));
+  const ticks = Math.max(1, Math.ceil(Math.abs(entry - sl)/step));
   const riskPerContract = ticks * tickVal;
   let contracts = Math.floor((riskPerTrade || 0) / riskPerContract);
   if(contracts < 1) contracts = 1;
@@ -232,12 +232,6 @@ Entry: ${res.entry}
 SL: ${res.sl}
 TPs: ${res.tps.join(", ")}
 CRV: ${res.crv.toFixed(2)} | Tagestrend: ${res.bias} | TP1-Wahrscheinlichkeit: ${(res.tp1Prob*100).toFixed(0)}%`;
-
-  if (res.notes && res.notes.length){
-    // Füge Hinweise (z.B. Risiko/Empfehlung) unten an den Copy-Text an
-    copyText += "\n" + res.notes.join("\n");
-  }
-
   area.innerHTML = `
     <div class="signal-row" style="align-items:center">
       <span class="badge ${res.rating==='A++'?'good': res.rating==='A'?'warn':'bad'}">${res.ampel} ${res.rating}</span>
@@ -252,7 +246,7 @@ CRV: ${res.crv.toFixed(2)} | Tagestrend: ${res.bias} | TP1-Wahrscheinlichkeit: $
       <div class="box sl"><div><strong>SL</strong></div><div>${res.sl}</div></div>
       ${tpsHtml}
     </div>
-    <div class="copy" id="copyBox">${copyText}</div>
+    <div class="copy" id="copyBox">${copyText}${(res.notes&&res.notes.length)? "\n" + res.notes.join("\n") : ""}</div>
   `;
 }
 
@@ -340,46 +334,67 @@ document.addEventListener("DOMContentLoaded", ()=>{
       }
     }
 
-    const result = computeSignalFutures(input, optionFindings);
     
-    // --- AJS Risk Enforcement (minimal) ---
-    const maxRisk = num($("riskPerTrade").value);
-    function riskPerContractUSD(mkt){
-      const step = stepFor(mkt); const tickVal = tickValueFor(mkt);
-      const ticks = Math.max(1, Math.ceil(Math.abs((result.entry||0) - (result.sl||0))/step));
-      return {ticks, usd: ticks*tickVal};
-    }
-    let outMarket = m;
-    if (!isNaN(maxRisk) && maxRisk>0){
-      const rMini = riskPerContractUSD(m);
-      if (rMini.usd > maxRisk){
-        const autoMicro = !!($("autoMicroToggle") && $("autoMicroToggle").checked);
-        const microMap = { ES:"MES", NQ:"MNQ" };
-        const micro = microMap[m] || null;
-        if (micro){
-          const rMicro = riskPerContractUSD(micro);
-          if (rMicro.usd <= maxRisk){
-            if (autoMicro){
-              outMarket = micro;
-              if (result.notes) result.notes.push(`Auto Micro: ${micro} (Risiko/Kontrakt ${rMicro.usd.toFixed(2)} USD ≤ Max ${maxRisk.toFixed(2)} USD)`);
-            } else {
-              if (result.notes) result.notes.push(`Empfehlung: ${micro} (Risiko/Kontrakt ${rMicro.usd.toFixed(2)} USD ≤ Max ${maxRisk.toFixed(2)} USD)`);
-              result.active = false;
-            }
-          } else {
-            if (result.notes) result.notes.push(`Abgelehnt: Risiko ${rMini.usd.toFixed(2)} USD > Max ${maxRisk.toFixed(2)} USD; auch ${micro} = ${rMicro.usd.toFixed(2)} USD zu groß.`);
-            result.active = false;
-          }
+const result = computeSignalFutures(input, optionFindings);
+
+// --- Risk enforcement & Mini→Micro toggle ---
+const riskMax = num($("riskPerTrade").value);
+if (!isNaN(riskMax) && riskMax > 0 && result && result.entry && result.sl) {
+  const stepX = stepFor(m);
+  const tickValX = tickValueFor(m);
+  const ticksX = Math.max(1, Math.ceil(Math.abs(result.entry - result.sl)/stepX));
+  const riskPer1 = ticksX * tickValX;
+
+  const autoMicro = (document.getElementById("autoMicroToggle")?.checked === true);
+  const isMini = (m === "ES" || m === "NQ");
+  if (riskPer1 > riskMax) {
+    if (isMini) {
+      const micro = (m === "ES") ? "MES" : "MNQ";
+      const stepM = stepFor(micro);
+      const tickValM = tickValueFor(micro);
+      const ticksM = Math.max(1, Math.ceil(Math.abs(result.entry - result.sl)/stepM));
+      const riskPer1M = ticksM * tickValM;
+      if (riskPer1M <= riskMax) {
+        if (autoMicro) {
+          // switch market to micro for output
+          m = micro;
+          // annotate
+          result.notes = (result.notes||[]).concat([`Auto Micro aktiv → ${micro} (Risiko/K: ${riskPer1M.toFixed(2)}$, Max: ${riskMax.toFixed(2)}$)`]);
         } else {
-          if (result.notes) result.notes.push(`Abgelehnt: Risiko ${rMini.usd.toFixed(2)} USD > Max ${maxRisk.toFixed(2)} USD.`);
-          result.active = false;
+          // block and suggest micro
+          const area = $("signalArea");
+          area.innerHTML = `<div class="badge warn">⚠️ Max-Risiko überschritten für ${m} (≈ ${riskPer1.toFixed(2)}$ pro Kontrakt).<br/>Empfehlung: ${micro} (≈ ${riskPer1M.toFixed(2)}$ pro Kontrakt) oder SL enger setzen.</div>`;
+          return;
         }
       } else {
-        const maxLots = Math.floor(maxRisk / rMini.usd);
-        if (maxLots >= 1 && result.notes) result.notes.push(`Kontrakt-Empfehlung: ${maxLots} (Risiko/Kontrakt ${rMini.usd.toFixed(2)} USD, Max ${maxRisk.toFixed(2)} USD)`);
+        const area = $("signalArea");
+        area.innerHTML = `<div class="badge warn">⚠️ Max-Risiko überschritten (Mini & Micro). Bitte SL enger setzen oder Risiko erhöhen.</div>`;
+        return;
       }
+    } else {
+      // Non-mini instrument too risky → block
+      const area = $("signalArea");
+      area.innerHTML = `<div class="badge warn">⚠️ Max-Risiko überschritten (≈ ${riskPer1.toFixed(2)}$ pro Kontrakt). Bitte SL enger setzen oder Micro wählen.</div>`;
+      return;
     }
-    renderSignal(result, outMarket);
+  } else {
+    // within risk, annotate info line
+    result.notes = (result.notes||[]).concat([`Risiko/Kontrakt: ${riskPer1.toFixed(2)}$ (Max: ${riskMax.toFixed(2)}$)`]);
+  }
+}
+
+// old sizing preview (not used in output, kept for compatibility)
+const pos = (isNaN(num($("riskPerTrade").value))) ? null : (function(){
+  const tickVal = tickValueFor(m);
+  const step = stepFor(m);
+  const ticks = Math.max(1, Math.ceil(Math.abs(result.entry - result.sl)/step));
+  const riskPerContract = ticks * tickVal;
+  let contracts = Math.floor((num($("riskPerTrade").value) || 0) / riskPerContract);
+  if(contracts < 1) contracts = 1;
+  return {contracts, ticks, riskPerContract};
+})();
+
+renderSignal(result, m);
 
   });
 });

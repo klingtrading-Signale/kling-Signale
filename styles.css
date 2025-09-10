@@ -1,0 +1,46 @@
+
+:root{
+  --bg:#0b0d12;
+  --card:#111522;
+  --muted:#a6b0cf;
+  --text:#e7ecff;
+  --accent:#7aa2ff;
+  --good:#1ec28b;
+  --warn:#ffd166;
+  --bad:#ff6b6b;
+  --blue:#5aa9ff;
+  --red:#ff4d6d;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Inter,Helvetica,Arial}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 22px;border-bottom:1px solid #1c2236;background:linear-gradient(180deg,#0d111a 0%, #0b0d12 100%);position:sticky;top:0;z-index:10}
+.brand{display:flex;align-items:center;gap:12px}
+.logo{width:36px;height:36px}
+.container{max-width:1100px;margin:24px auto;padding:0 16px;display:grid;gap:18px;grid-template-columns:1fr}
+.card{background:var(--card);border:1px solid #1b2134;border-radius:14px;padding:16px 16px 22px;box-shadow:0 6px 26px rgba(0,0,0,.25)}
+h1,h2,h3{margin:6px 0 12px}
+.grid{display:grid;gap:12px}
+.grid-1{grid-template-columns:1fr}
+.grid-2{grid-template-columns:1fr 1fr}
+.grid-3{grid-template-columns:1fr 1fr 1fr}
+label{display:block;margin:2px 0 6px;color:var(--muted);font-size:12px}
+input,select{width:100%;padding:10px 12px;border:1px solid #20263a;border-radius:10px;background:#0f1422;color:var(--text)}
+input::placeholder{color:#6e7899}
+.uploader{margin-top:10px;padding:12px;border:1px dashed #2a3350;border-radius:10px}
+.muted{color:var(--muted);font-size:13px}
+.actions{display:flex;gap:12px;margin-top:16px}
+button{background:var(--accent);color:#06122d;border:none;border-radius:10px;padding:10px 14px;font-weight:600;cursor:pointer}
+button#reset{background:#29314a;color:#cdd6ff}
+.signal-area{display:flex;flex-direction:column;gap:10px}
+.signal-row{display:flex;gap:10px;flex-wrap:wrap}
+.box{border-radius:12px;padding:12px 14px;border:1px solid #223058;min-width:180px}
+.box.entry{background:#0e1d3a;border-color:#24427a}
+.box.sl{background:#1e0d19;border-color:#52223e}
+.box.tp{background:#0d1e16;border-color:#1b6a49}
+.badge{display:inline-flex;align-items:center;gap:8px;padding:6px 10px;border-radius:999px;font-weight:600;font-size:12px;border:1px solid #223058;background:#0b1326}
+.badge.good{border-color:#1c5b44;background:#0c1d17;color:#70ffca}
+.badge.warn{border-color:#5b4a1c;background:#1d170c;color:#ffe08a}
+.badge.bad{border-color:#5b1c2e;background:#1d0c12;color:#ff9fb4}
+.copy{white-space:pre-wrap;background:#0f1422;border:1px solid #1e2742;border-radius:12px;padding:10px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace}
+.footer{opacity:.7;text-align:center;padding:18px 0}
+@media (max-width:900px){.grid-3{grid-template-columns:1fr}.grid-2{grid-template-columns:1fr}}

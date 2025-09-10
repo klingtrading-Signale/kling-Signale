@@ -201,6 +201,11 @@
           <input id="riskPerTrade" type="number" step="1" placeholder="z.B. 50"/>
         </div>
         <div>
+          <label>Auto Micro (ES→MES / NQ→MNQ)</label>
+          <input id="autoMicroToggle" type="checkbox"/>
+        </div>
+
+        <div>
           <label>CRV Mindestfilter</label>
           <select id="rrFilter">
             <option value="1">≥ 1:1</option>
@@ -237,10 +242,6 @@
         </div>
       </div>
 
-        <div>
-          <label>Auto Micro (ES→MES / NQ→MNQ)</label>
-          <input id="autoMicroToggle" type="checkbox"/>
-        </div>
       <div class="actions">
         <button id="generate">Signal generieren</button>
         <button id="reset">Formular zurücksetzen</button>

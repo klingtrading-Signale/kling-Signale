@@ -1,0 +1,41 @@
+<!-- JOURNAL: START -->
+<section class="ajs-card" id="journalSection">
+  <h2>Journal</h2>
+  <div class="ajs-grid ajs-grid-3">
+    <div>
+      <label>Filter Markt</label>
+      <select id="ajsJournalMarketFilter">
+        <option value="ALL">Alle</option>
+        <option value="ES">ES</option>
+        <option value="MES">MES</option>
+        <option value="NQ">NQ</option>
+        <option value="MNQ">MNQ</option>
+        <option value="BTC">BTC</option>
+        <option value="DOGE">DOGE</option>
+        <option value="SOL">SOL</option>
+        <option value="SHIB">SHIB</option>
+        <option value="XRP">XRP</option>
+      </select>
+    </div>
+    <div>
+      <label>Filter Ergebnis</label>
+      <select id="ajsJournalResultFilter">
+        <option value="ALL">Alle</option>
+        <option value="TP1">TP1</option>
+        <option value="TP2">TP2</option>
+        <option value="TP3">TP3</option>
+        <option value="SL">SL</option>
+        <option value="MANUAL">Manuell</option>
+        <option value="OPEN">Offen</option>
+      </select>
+    </div>
+    <div class="ajs-actions-inline">
+      <button id="ajsExportCSV">Export CSV</button>
+      <button id="ajsClearJournal" class="ajs-danger">Journal leeren</button>
+    </div>
+  </div>
+  <div id="ajsJournalStats" class="ajs-stats"></div>
+  <div id="ajsJournalTable" class="ajs-table"></div>
+</section>
+<button id="ajsJournalAddBtn" class="ajs-ghost" disabled>Zum Journal hinzufügen</button>
+<!-- JOURNAL: END -->

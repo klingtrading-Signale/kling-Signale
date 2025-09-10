@@ -1,0 +1,8 @@
+/* ajs- Journal minimal styles (no override of existing classes) */
+.ajs-table-wrap{overflow:auto}
+.ajs-table{width:100%;border-collapse:collapse;font-size:12px}
+.ajs-table th,.ajs-table td{border:1px solid #1b2134;padding:6px;vertical-align:top}
+.ajs-table th{position:sticky;top:0;background:#0d111a}
+.ajs-actions{display:flex;flex-wrap:wrap;gap:6px}
+.ajs-stats{margin:8px 0;font-size:13px;opacity:.95}
+.ajs-pill{display:inline-block;padding:2px 6px;border:1px solid #2a3452;border-radius:14px;margin-right:4px}

@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 200 200" fill="none">
+  <rect width="200" height="200" rx="24" fill="#0f1422"/>
+  <path d="M40 130 L80 50 L120 130 Z" stroke="#7aa2ff" stroke-width="10" fill="none" stroke-linejoin="round"/>
+  <circle cx="140" cy="70" r="20" fill="#1ec28b"/>
+  <text x="36" y="170" font-size="28" font-family="Arial" fill="#e7ecff">A++</text>
+</svg>
