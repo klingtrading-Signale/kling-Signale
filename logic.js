@@ -358,13 +358,13 @@ if (!isNaN(riskMax) && riskMax > 0 && result && result.entry && result.sl) {
         if (autoMicro) {
           // switch market to micro for output
           m = micro;
-          // annotate
           result.notes = (result.notes||[]).concat([`Auto Micro aktiv → ${micro} (Risiko/K: ${riskPer1M.toFixed(2)}$, Max: ${riskMax.toFixed(2)}$)`]);
         } else {
-          // block and suggest micro
-          const area = $("signalArea");
-          area.innerHTML = `<div class="badge warn">⚠️ Max-Risiko überschritten für ${m} (≈ ${riskPer1.toFixed(2)}$ pro Kontrakt).<br/>Empfehlung: ${micro} (≈ ${riskPer1M.toFixed(2)}$ pro Kontrakt) oder SL enger setzen.</div>`;
-          return;
+          // render Micro as recommended signal (do NOT block)
+          m = micro;
+          result.notes = (result.notes||[]).concat([
+            `Empfohlenes Micro-Signal: ${micro} (Risiko/K: ${riskPer1M.toFixed(2)}$, Max: ${riskMax.toFixed(2)}$) – Mini (${m==="MES"?"ES":m==="MNQ"?"NQ":m}) überschreitet das Max-Risiko.`
+          ]);
         }
       } else {
         const area = $("signalArea");
